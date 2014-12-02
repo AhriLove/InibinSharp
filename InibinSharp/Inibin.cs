@@ -262,14 +262,17 @@ namespace InibinSharp
 
         public T GetValue<T>(string section, string name)
         {
+            return GetValue<T>(GetKeyHash(section, name));
+        }
+
+        public T GetValue<T>(UInt32 key)
+        {
             try
             {
-                if (!KeyExists(section, name))
+                if (!Values.ContainsKey(key))
                 {
                     return default(T);
                 }
-
-                var key = GetKeyHash(section, name);
 
                 if (typeof (T) == typeof (byte))
                 {
@@ -292,7 +295,7 @@ namespace InibinSharp
                     return (T) (object) Values[key].ToString();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return default(T);
             }
