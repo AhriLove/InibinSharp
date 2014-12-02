@@ -22,14 +22,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using InibinSharp.RAF;
 
 #endregion
 
 namespace InibinSharp
 {
     /// <summary>
-    /// Port of
-    /// https://github.com/Elyotna/IntWars/blob/d8d4a6d369f294a227f78fe096119444cc315cfb/dep/include/raf/Inibin.h
+    ///     Port of
+    ///     https://github.com/Elyotna/IntWars/blob/d8d4a6d369f294a227f78fe096119444cc315cfb/dep/include/raf/Inibin.h
     /// </summary>
     public class Inibin : IDisposable
     {
@@ -37,9 +38,24 @@ namespace InibinSharp
         private readonly BinaryReader _reader;
         public readonly Dictionary<UInt32, Object> Values = new Dictionary<uint, Object>();
 
-        public Inibin(string file)
+        public Inibin(byte[] data)
+            : this(new MemoryStream(data))
         {
-            _reader = new BinaryReader(new MemoryStream(File.ReadAllBytes(file)));
+        }
+
+        public Inibin(string filePath)
+            : this(File.ReadAllBytes(filePath))
+        {
+        }
+
+        public Inibin(RAFFileListEntry file)
+            : this(file.GetContent())
+        {
+        }
+
+        public Inibin(Stream stream)
+        {
+            _reader = new BinaryReader(stream);
 
             var size = (int) _reader.BaseStream.Length;
             var version = ReadValue<byte>();
@@ -47,7 +63,6 @@ namespace InibinSharp
             var bitmask = ReadValue<UInt16>();
             _stringOffset = size - oldLength;
 
-            Debug.WriteLine("Parse Inibin:" + file);
             Debug.WriteLine("Version:" + version);
             Debug.WriteLine("Length:" + size);
             Debug.WriteLine("OldLength:" + oldLength);
@@ -245,25 +260,6 @@ namespace InibinSharp
             return result;
         }
 
-        private UInt32 GetKeyHash(string section, string name)
-        {
-            UInt32 hash = 0;
-
-            foreach (var c in section.ToLower())
-            {
-                hash = c + 65599*hash;
-            }
-
-            hash = (65599*hash + 42);
-
-            foreach (var c in name.ToLower())
-            {
-                hash = c + 65599*hash;
-            }
-
-            return hash;
-        }
-
         public T GetValue<T>(string section, string name)
         {
             try
@@ -315,6 +311,25 @@ namespace InibinSharp
             {
                 _reader.Dispose();
             }
+        }
+
+        public static UInt32 GetKeyHash(string section, string name)
+        {
+            UInt32 hash = 0;
+
+            foreach (var c in section.ToLower())
+            {
+                hash = c + 65599*hash;
+            }
+
+            hash = (65599*hash + 42);
+
+            foreach (var c in name.ToLower())
+            {
+                hash = c + 65599*hash;
+            }
+
+            return hash;
         }
     }
 }
