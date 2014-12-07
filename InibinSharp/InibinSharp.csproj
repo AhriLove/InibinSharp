@@ -34,11 +34,11 @@
     <Reference Include="System.Core" />
     <Reference Include="wLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\wLib.dll</HintPath>
+      <HintPath>dependencies\wLib.dll</HintPath>
     </Reference>
     <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\zlib.net.dll</HintPath>
+      <HintPath>dependencies\zlib.net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +49,10 @@
     <Compile Include="RAF\RAFFileListEntry.cs" />
     <Compile Include="RAF\RAFHashManager.cs" />
     <Compile Include="RAF\RAFMasterFileList.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dependencies\wLib.dll" />
+    <None Include="dependencies\zlib.net.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
