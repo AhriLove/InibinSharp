@@ -28,9 +28,6 @@ using InibinSharp.RAF;
 
 namespace InibinSharp
 {
-    /// <summary>
-    ///     Port of https://github.com/Elyotna/IntWars/blob/d8d4a6d369f294a227f78fe096119444cc315cfb/dep/include/raf/Inibin.h
-    /// </summary>
     public class Inibin : IDisposable
     {
         private readonly BinaryReader _reader;
@@ -148,7 +145,7 @@ namespace InibinSharp
             }
         }
 
-        private void AddProperty<T>(UInt32 key, T value)
+        private void AddValue<T>(UInt32 key, T value)
         {
             Values.Add(key, value);
             Debug.WriteLine("{0} [{1}] = {2}", typeof (T).Name, key, value);
@@ -177,7 +174,7 @@ namespace InibinSharp
                     {
                         var key = keys[index];
                         var val = 0x1 & bits;
-                        AddProperty(key, val);
+                        AddValue(key, val);
                         bits = bits >> 1;
                         if (++index == keys.Length)
                         {
@@ -191,7 +188,7 @@ namespace InibinSharp
                 foreach (var key in keys)
                 {
                     var offset = ReadValue<UInt16>();
-                    AddProperty(key, ReadValue<string>(_stringOffset + offset));
+                    AddValue(key, ReadValue<string>(_stringOffset + offset));
                 }
             }
             else
@@ -200,11 +197,11 @@ namespace InibinSharp
                 {
                     if (isBase10)
                     {
-                        AddProperty(key, ((byte) (object) ReadValue<T>())*0.1f);
+                        AddValue(key, ((byte) (object) ReadValue<T>())*0.1f);
                     }
                     else
                     {
-                        AddProperty(key, ReadValue<T>());
+                        AddValue(key, ReadValue<T>());
                     }
                 }
             }
