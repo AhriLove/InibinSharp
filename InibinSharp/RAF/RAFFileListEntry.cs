@@ -35,11 +35,11 @@ namespace InibinSharp.RAF
     /// </summary>
     public class RAFFileListEntry
     {
-        private readonly RAFArchive m_raf;
+        private UInt32 m_fileOffset = UInt32.MaxValue;
+        //It is assumed that LoL archive files will never reach 4 gigs of size.
 
-        private UInt32 m_fileOffset = UInt32.MaxValue; //It is assumed that LoL archive files will never reach 4 gigs of size.
         private UInt32 m_fileSize = UInt32.MaxValue;
-        private string m_fileName;
+        private readonly RAFArchive m_raf;
 
         /// <summary>
         ///     A class that represents a file within an RAF archive
@@ -48,7 +48,8 @@ namespace InibinSharp.RAF
         /// <param name="directoryFileContent">Pointer to the content of the .raf.dat file</param>
         /// <param name="offsetDirectoryEntry">Offset to the entry data offsets</param>
         /// <param name="offsetStringTable">Offset to the entry's file name</param>
-        public RAFFileListEntry(RAFArchive raf, ref byte[] directoryFileContent, UInt32 offsetDirectoryEntry, UInt32 offsetStringTable)
+        public RAFFileListEntry(RAFArchive raf, ref byte[] directoryFileContent, UInt32 offsetDirectoryEntry,
+            UInt32 offsetStringTable)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
@@ -64,9 +65,10 @@ namespace InibinSharp.RAF
             var entryValueOffset = BitConverter.ToUInt32(directoryFileContent, (int) entryOffset);
             var entryValueSize = BitConverter.ToUInt32(directoryFileContent, (int) entryOffset + 4);
 
-            var stringBytes = directoryFileContent.SubArray((int) (entryValueOffset + offsetStringTable), (int) entryValueSize - 1);
+            var stringBytes = directoryFileContent.SubArray((int) (entryValueOffset + offsetStringTable),
+                (int) entryValueSize - 1);
 
-            m_fileName = Encoding.ASCII.GetString(stringBytes);
+            FileName = Encoding.ASCII.GetString(stringBytes);
         }
 
         /// <summary>
@@ -79,9 +81,53 @@ namespace InibinSharp.RAF
         public RAFFileListEntry(RAFArchive raf, string fileName, UInt32 offsetDatFile, UInt32 fileSize)
         {
             m_raf = raf;
-            m_fileName = fileName;
+            FileName = fileName;
             m_fileOffset = offsetDatFile;
             m_fileSize = fileSize;
+        }
+
+        /// <summary>
+        ///     Filename of the entry
+        /// </summary>
+        public String FileName { get; set; }
+
+        public String ShortFileName
+        {
+            get { return FileName.Substring(FileName.LastIndexOf('/') + 1); }
+        }
+
+        /// <summary>
+        ///     Offset to the start of the archived file in the .dat file
+        /// </summary>
+        public UInt32 FileOffset
+        {
+            get { return m_fileOffset; }
+            set { m_fileOffset = value; }
+        }
+
+        /// <summary>
+        ///     Size of this archived file
+        /// </summary>
+        public UInt32 FileSize
+        {
+            get { return m_fileSize; }
+            set { m_fileSize = value; }
+        }
+
+        /// <summary>
+        ///     Hash of the string name
+        /// </summary>
+        public UInt32 StringNameHash
+        {
+            get { return RAFHashManager.GetHash(FileName); }
+        }
+
+        /// <summary>
+        ///     Returns the entry's corresponding RAFArchive
+        /// </summary>
+        public RAFArchive RAFArchive
+        {
+            get { return m_raf; }
         }
 
         /// <summary>
@@ -157,54 +203,6 @@ namespace InibinSharp.RAF
         }
 
         /// <summary>
-        ///     Filename of the entry
-        /// </summary>
-        public String FileName
-        {
-            get { return m_fileName; }
-            set { m_fileName = value; }
-        }
-
-        public String ShortFileName
-        {
-            get { return FileName.Substring(FileName.LastIndexOf('/') + 1); }
-        }
-
-        /// <summary>
-        ///     Offset to the start of the archived file in the .dat file
-        /// </summary>
-        public UInt32 FileOffset
-        {
-            get { return m_fileOffset; }
-            set { m_fileOffset = value; }
-        }
-
-        /// <summary>
-        ///     Size of this archived file
-        /// </summary>
-        public UInt32 FileSize
-        {
-            get { return m_fileSize; }
-            set { m_fileSize = value; }
-        }
-
-        /// <summary>
-        ///     Hash of the string name
-        /// </summary>
-        public UInt32 StringNameHash
-        {
-            get { return RAFHashManager.GetHash(FileName); }
-        }
-
-        /// <summary>
-        ///     Returns the entry's corresponding RAFArchive
-        /// </summary>
-        public RAFArchive RAFArchive
-        {
-            get { return m_raf; }
-        }
-
-        /// <summary>
         ///     Replace the content of the RAFFileListEntry and update memory of this new data.
         ///     You HAVE to call &lt;RAFArchive&gt;.SaveRAFFile() after you finish all the inserts.
         /// </summary>
@@ -248,7 +246,7 @@ namespace InibinSharp.RAF
                 datFileStream.Seek(0, SeekOrigin.End);
                 var offset = (UInt32) datFileStream.Length;
 
-                var fInfo = new FileInfo(m_fileName);
+                var fInfo = new FileInfo(FileName);
 
                 // .fsb, .fev, and .gfx files aren't compressed
                 byte[] finalContent;
@@ -260,7 +258,8 @@ namespace InibinSharp.RAF
                 {
                     // Start of compression
                     var mStream = new MemoryStream();
-                    var oStream = new ZOutputStream(mStream, zlibConst.Z_DEFAULT_COMPRESSION); //using default compression level
+                    var oStream = new ZOutputStream(mStream, zlibConst.Z_DEFAULT_COMPRESSION);
+                    //using default compression level
                     oStream.Write(content, 0, content.Length);
                     oStream.finish();
                     finalContent = mStream.ToArray();

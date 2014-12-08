@@ -31,8 +31,11 @@ namespace InibinSharp.RAF
     /// </summary>
     public class RAFMasterFileList
     {
-        private readonly Dictionary<String, List<RAFFileListEntry>> m_fileDictFull = new Dictionary<String, List<RAFFileListEntry>>();
-        private readonly Dictionary<String, List<RAFFileListEntry>> m_fileDictShort = new Dictionary<String, List<RAFFileListEntry>>();
+        private readonly Dictionary<String, List<RAFFileListEntry>> m_fileDictFull =
+            new Dictionary<String, List<RAFFileListEntry>>();
+
+        private readonly Dictionary<String, List<RAFFileListEntry>> m_fileDictShort =
+            new Dictionary<String, List<RAFFileListEntry>>();
 
         /// <summary>
         ///     Allows the easy manipulation of RAF archives. With this class the user can pretend there is only one giant RAF
@@ -115,7 +118,8 @@ namespace InibinSharp.RAF
         ///     returns any entries whose filepath ends with the search string.
         /// </param>
         /// <returns></returns>
-        public List<RAFFileListEntry> SearchFileEntries(String searchPhrase, RAFSearchType searchType = RAFSearchType.All)
+        public List<RAFFileListEntry> SearchFileEntries(String searchPhrase,
+            RAFSearchType searchType = RAFSearchType.All)
         {
             var lowerPhrase = searchPhrase.ToLower();
             var results = new List<RAFFileListEntry>();
@@ -148,7 +152,8 @@ namespace InibinSharp.RAF
         ///     returns any entries whose filepath ends with the search string.
         /// </param>
         /// <returns>A struct with the found RAFFileListEntry and the search phrase that triggered it</returns>
-        public List<RAFSearchResult> SearchFileEntries(String[] searchPhrases, RAFSearchType searchType = RAFSearchType.All)
+        public List<RAFSearchResult> SearchFileEntries(String[] searchPhrases,
+            RAFSearchType searchType = RAFSearchType.All)
         {
             var results = new List<RAFSearchResult>();
 
@@ -209,7 +214,8 @@ namespace InibinSharp.RAF
         }
 
         // Add Full dictionary to MasterFileList dict
-        private static Dictionary<String, List<RAFFileListEntry>> CombineFileDicts(Dictionary<String, List<RAFFileListEntry>> dict1,
+        private static Dictionary<String, List<RAFFileListEntry>> CombineFileDicts(
+            Dictionary<String, List<RAFFileListEntry>> dict1,
             Dictionary<String, RAFFileListEntry> dict2)
         {
             foreach (var entryKVP in dict2)
@@ -225,7 +231,8 @@ namespace InibinSharp.RAF
         }
 
         // Add Short dictionary to MasterFileList dict
-        private static Dictionary<String, List<RAFFileListEntry>> CombineFileDicts(Dictionary<String, List<RAFFileListEntry>> dict1,
+        private static Dictionary<String, List<RAFFileListEntry>> CombineFileDicts(
+            Dictionary<String, List<RAFFileListEntry>> dict1,
             Dictionary<String, List<RAFFileListEntry>> dict2)
         {
             foreach (var entryKVP in dict2)

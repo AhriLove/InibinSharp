@@ -28,6 +28,19 @@ namespace InibinSharp.RAF
     /// </summary>
     public class RAFArchiveID
     {
+        private RAFArchiveID(int a, int b, int c, int d)
+        {
+            A = a;
+            B = b;
+            C = c;
+            D = d;
+        }
+
+        public int A { get; private set; }
+        public int B { get; private set; }
+        public int C { get; private set; }
+        public int D { get; private set; }
+
         protected bool Equals(RAFArchiveID other)
         {
             return this == other;
@@ -43,20 +56,12 @@ namespace InibinSharp.RAF
             if (obj.GetType() != GetType())
                 return false;
 
-            return this == obj;
+            return ReferenceEquals(this, obj);
         }
 
-        public int A { get; private set; }
-        public int B { get; private set; }
-        public int C { get; private set; }
-        public int D { get; private set; }
-
-        private RAFArchiveID(int a, int b, int c, int d)
+        public override int GetHashCode()
         {
-            A = a;
-            B = b;
-            C = c;
-            D = d;
+            return base.GetHashCode();
         }
 
         /// <summary>

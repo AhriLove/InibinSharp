@@ -34,28 +34,21 @@ namespace InibinSharp.RAF
     /// </summary>
     public class RAFArchive
     {
-        // Path to the archive
-        private readonly string m_rafPath;
-
-        private readonly RAFArchiveID m_id;
-
-        // Magic value used to identify the file type, must be 0x18BE0EF0
-        private readonly UInt32 m_magic;
-
-        // Version of the archive format, must be 1
-        private readonly UInt32 m_version;
-
-        // An index of the filetype. Don't modify this
-        private readonly UInt32 m_mgrIndex;
-
         // Byte array to hold the contents of the .raf file
         private byte[] m_content;
-
         // Dictionary with the full path of the RAF entry as the key
         private readonly Dictionary<String, RAFFileListEntry> m_fileDictFull;
-
         // Dictionary with just the file name as the key
         private readonly Dictionary<String, List<RAFFileListEntry>> m_fileDictShort;
+        private readonly RAFArchiveID m_id;
+        // Magic value used to identify the file type, must be 0x18BE0EF0
+        private readonly UInt32 m_magic;
+        // An index of the filetype. Don't modify this
+        private readonly UInt32 m_mgrIndex;
+        // Path to the archive
+        private readonly string m_rafPath;
+        // Version of the archive format, must be 1
+        private readonly UInt32 m_version;
 
         /// <summary>
         ///     A class that allows the easy manipulation of RAF archives
@@ -116,7 +109,9 @@ namespace InibinSharp.RAF
             //After the file list count, we have the actual data.
             offsetFileList += 4;
 
-            for (var currentOffset = offsetFileList; currentOffset < offsetFileList + 16*fileListCount; currentOffset += 16)
+            for (var currentOffset = offsetFileList;
+                currentOffset < offsetFileList + 16*fileListCount;
+                currentOffset += 16)
             {
                 var entry = new RAFFileListEntry(raf, ref raf.m_content, currentOffset, offsetStringTable);
                 raf.m_fileDictFull.Add(entry.FileName.ToLower(), entry);
@@ -171,7 +166,8 @@ namespace InibinSharp.RAF
         ///     returns any entries whose filepath ends with the search string.
         /// </param>
         /// <returns></returns>
-        public List<RAFFileListEntry> SearchFileEntries(String searchPhrase, RAFSearchType searchType = RAFSearchType.All)
+        public List<RAFFileListEntry> SearchFileEntries(String searchPhrase,
+            RAFSearchType searchType = RAFSearchType.All)
         {
             var lowerPhrase = searchPhrase.ToLower();
             var results = new List<RAFFileListEntry>();
@@ -201,7 +197,8 @@ namespace InibinSharp.RAF
         ///     returns any entries whose filepath ends with the search string.
         /// </param>
         /// <returns>A struct with the found RAFFileListEntry and the search phrase that triggered it</returns>
-        public List<RAFSearchResult> SearchFileEntries(String[] searchPhrases, RAFSearchType searchType = RAFSearchType.All)
+        public List<RAFSearchResult> SearchFileEntries(String[] searchPhrases,
+            RAFSearchType searchType = RAFSearchType.All)
         {
             var results = new List<RAFSearchResult>();
 
@@ -273,12 +270,14 @@ namespace InibinSharp.RAF
         ///     given fileName
         /// </param>
         /// <returns></returns>
-        public bool InsertFile(string fileName, byte[] content, FileStream datFileStream, bool createNewIfNoExist = false)
+        public bool InsertFile(string fileName, byte[] content, FileStream datFileStream,
+            bool createNewIfNoExist = false)
         {
             return InsertFileHelperFunc(fileName, content, datFileStream, createNewIfNoExist);
         }
 
-        private bool InsertFileHelperFunc(string fileName, byte[] content, FileStream datFileStream, bool createNewIfNoExist = false)
+        private bool InsertFileHelperFunc(string fileName, byte[] content, FileStream datFileStream,
+            bool createNewIfNoExist = false)
         {
             var fileEntry = GetFileEntry(fileName);
             // File exists in archive
