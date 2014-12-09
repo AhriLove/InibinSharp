@@ -147,8 +147,11 @@ namespace InibinSharp
 
         private void AddValue<T>(UInt32 key, T value)
         {
-            Values.Add(key, value);
-            Debug.WriteLine("{0} [{1}] = {2}", typeof (T).Name, key, value);
+            if (!Values.ContainsKey(key))
+            {
+                Values.Add(key, value);
+                Debug.WriteLine("{0} [{1}] = {2}", typeof (T).Name, key, value);
+            }
         }
 
         private void SkipValues(int size)
